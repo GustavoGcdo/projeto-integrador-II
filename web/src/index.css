@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@theme {
+  --color-eco-50: #eefdf5;
+  --color-eco-100: #d7fae8;
+  --color-eco-500: #18a566;
+  --color-eco-600: #118451;
+  --color-eco-700: #0f6842;
+  --color-eco-900: #093b27;
+}
+
+@layer base {
+  :root {
+    color: #0f172a;
+    background:
+      radial-gradient(circle at top left, rgba(215, 250, 232, 0.9), transparent 36%),
+      linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+    font-family:
+      "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: transparent;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .map-grid {
+    background-image:
+      linear-gradient(rgba(15, 104, 66, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(15, 104, 66, 0.08) 1px, transparent 1px);
+    background-size: 38px 38px;
+  }
+}

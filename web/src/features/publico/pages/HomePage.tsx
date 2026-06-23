@@ -1,18 +1,23 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AppShell } from '../../../components/ui/AppShell.tsx'
-import { MapPlaceholder } from '../../../components/ui/MapPlaceholder.tsx'
+import { EcoMap } from '../../../components/ui/EcoMap.tsx'
 import { PublicHeader } from '../../../components/ui/PublicHeader.tsx'
 import { ecodescarteApi } from '../../../services/api/ecodescarte.ts'
-import type { WasteType } from '../../../types/models.ts'
+import type { DropoffPointSummary, WasteType } from '../../../types/models.ts'
 
 export function HomePage() {
   const navigate = useNavigate()
   const [wasteTypes, setWasteTypes] = useState<WasteType[]>([])
+  const [points, setPoints] = useState<DropoffPointSummary[]>([])
   const [query, setQuery] = useState('Pilhas e baterias')
 
   useEffect(() => {
     ecodescarteApi.listWasteTypes().then(setWasteTypes).catch(() => setWasteTypes([]))
+    ecodescarteApi
+      .listPublicPoints(new URLSearchParams())
+      .then(setPoints)
+      .catch(() => setPoints([]))
   }, [])
 
   return (
@@ -71,12 +76,15 @@ export function HomePage() {
         </div>
 
         <div className="rounded-[32px] border border-slate-100 bg-white p-6 shadow-2xl">
-          <MapPlaceholder
-            points={[
-              { id: 1, label: 'Ecoponto Centro', status: 'validated' },
-              { id: 2, label: 'Cooperativa Verde', status: 'validated' },
-              { id: 3, label: 'Mercado Boa Compra', status: 'needs_confirmation' },
-            ]}
+          <EcoMap
+            points={points.map((point) => ({
+              id: point.id,
+              name: point.name,
+              addressLine: point.addressLine,
+              latitude: point.latitude,
+              longitude: point.longitude,
+              status: point.validationStatus,
+            }))}
           />
         </div>
       </section>

@@ -2,8 +2,8 @@ import { ArrowLeft, Route } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AppShell } from '../../../components/ui/AppShell.tsx'
+import { EcoMap } from '../../../components/ui/EcoMap.tsx'
 import { EmptyState } from '../../../components/ui/EmptyState.tsx'
-import { MapPlaceholder } from '../../../components/ui/MapPlaceholder.tsx'
 import { StatusBadge } from '../../../components/ui/StatusBadge.tsx'
 import { SuggestionForm } from '../../../components/ui/SuggestionForm.tsx'
 import { ecodescarteApi } from '../../../services/api/ecodescarte.ts'
@@ -41,6 +41,11 @@ export function PointDetailPage() {
       </AppShell>
     )
   }
+
+  const mapHref =
+    point.latitude != null && point.longitude != null
+      ? `https://www.openstreetmap.org/?mlat=${point.latitude}&mlon=${point.longitude}#map=17/${point.latitude}/${point.longitude}`
+      : null
 
   return (
     <AppShell>
@@ -92,10 +97,23 @@ export function PointDetailPage() {
           </div>
 
           <div className="flex flex-wrap gap-4">
-            <button className="inline-flex items-center gap-2 rounded-xl bg-eco-600 px-6 py-4 font-semibold text-white" type="button">
+            <a
+              className={`inline-flex items-center gap-2 rounded-xl px-6 py-4 font-semibold ${
+                mapHref ? 'bg-eco-600 text-white' : 'cursor-not-allowed bg-slate-300 text-slate-500'
+              }`}
+              href={mapHref ?? undefined}
+              rel="noreferrer"
+              target="_blank"
+              aria-disabled={!mapHref}
+              onClick={(event) => {
+                if (!mapHref) {
+                  event.preventDefault()
+                }
+              }}
+            >
               <Route className="h-4 w-4" />
-              Como chegar
-            </button>
+              {mapHref ? 'Abrir no mapa' : 'Localizacao indisponivel'}
+            </a>
             <button
               className="rounded-xl border border-slate-300 bg-white px-6 py-4 font-semibold"
               type="button"
@@ -120,11 +138,14 @@ export function PointDetailPage() {
         <aside className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
           <h2 className="text-xl font-bold text-slate-950">Localizacao</h2>
           <div className="mt-4">
-            <MapPlaceholder
+            <EcoMap
               points={[
                 {
                   id: point.id,
-                  label: point.name,
+                  name: point.name,
+                  addressLine: point.addressLine,
+                  latitude: point.latitude,
+                  longitude: point.longitude,
                   status: point.validationStatus,
                 },
               ]}

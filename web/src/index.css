@@ -49,11 +49,72 @@
   }
 }
 
-@layer utilities {
-  .map-grid {
-    background-image:
-      linear-gradient(rgba(15, 104, 66, 0.08) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(15, 104, 66, 0.08) 1px, transparent 1px);
-    background-size: 38px 38px;
+@layer components {
+  .eco-map .leaflet-control-attribution {
+    background: rgba(255, 255, 255, 0.92);
+    color: #475569;
+    font-size: 11px;
+  }
+
+  .eco-map .leaflet-popup-content-wrapper {
+    border-radius: 16px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+  }
+
+  .eco-map .leaflet-popup-content {
+    margin: 0;
+    min-width: 180px;
+  }
+
+  .eco-map-popup {
+    padding: 0.9rem 1rem;
+    color: #0f172a;
+  }
+
+  .eco-map-popup strong {
+    display: block;
+    font-size: 0.95rem;
+  }
+
+  .eco-map-popup p {
+    margin: 0.4rem 0 0;
+    color: #475569;
+    font-size: 0.85rem;
+  }
+
+  .eco-map-popup span {
+    display: inline-flex;
+    margin-top: 0.7rem;
+    border-radius: 999px;
+    background: #eefdf5;
+    padding: 0.3rem 0.7rem;
+    color: #0f6842;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .eco-map-marker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.96);
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.18);
+  }
+
+  .eco-map-marker svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+  }
+
+  .eco-map-marker--validated {
+    background: linear-gradient(180deg, #18a566 0%, #0f6842 100%);
+  }
+
+  .eco-map-marker--needs_confirmation {
+    background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
   }
 }

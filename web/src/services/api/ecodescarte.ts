@@ -61,6 +61,8 @@ export const ecodescarteApi = {
       wasteTypeIds?: number[]
       status?: 'active' | 'inactive'
       validationStatus?: 'validated' | 'needs_confirmation'
+      latitude?: number
+      longitude?: number
     } = {},
   ) {
     return request<{ id: number; status: string }>(
@@ -94,6 +96,8 @@ export const ecodescarteApi = {
       city: string
       state?: string
       wasteTypeIds: number[]
+      latitude?: number
+      longitude?: number
       description?: string
       openingHours?: string
       phone?: string

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { AppShell } from '../../../components/ui/AppShell.tsx'
+import { EcoMap } from '../../../components/ui/EcoMap.tsx'
 import { EmptyState } from '../../../components/ui/EmptyState.tsx'
 import { FilterPanel } from '../../../components/ui/FilterPanel.tsx'
-import { MapPlaceholder } from '../../../components/ui/MapPlaceholder.tsx'
 import { PointCard } from '../../../components/ui/PointCard.tsx'
 import { PublicHeader } from '../../../components/ui/PublicHeader.tsx'
 import { ecodescarteApi } from '../../../services/api/ecodescarte.ts'
@@ -76,11 +76,14 @@ export function SearchPage() {
           </div>
 
           <div className="rounded-[28px] border border-slate-200 bg-white p-4 shadow-sm">
-            <MapPlaceholder
+            <EcoMap
               compact
-              points={points.slice(0, 4).map((point) => ({
+              points={points.map((point) => ({
                 id: point.id,
-                label: point.name,
+                name: point.name,
+                addressLine: point.addressLine,
+                latitude: point.latitude,
+                longitude: point.longitude,
                 status: point.validationStatus,
               }))}
             />

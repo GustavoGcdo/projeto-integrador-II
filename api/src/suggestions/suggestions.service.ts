@@ -137,6 +137,8 @@ export class SuggestionsService {
         addressText: approveSuggestionDto.addressText ?? suggestion.addressText,
         districtText: approveSuggestionDto.districtText ?? suggestion.districtText,
         cityText: approveSuggestionDto.cityText ?? suggestion.cityText,
+        latitude: approveSuggestionDto.latitude,
+        longitude: approveSuggestionDto.longitude,
         wasteTypeText: approveSuggestionDto.wasteTypeText ?? suggestion.wasteTypeText,
         openingHoursText:
           approveSuggestionDto.openingHoursText ?? suggestion.openingHoursText,
@@ -168,6 +170,8 @@ export class SuggestionsService {
       addressText: approveSuggestionDto.addressText ?? suggestion.addressText,
       districtText: approveSuggestionDto.districtText ?? suggestion.districtText,
       cityText: approveSuggestionDto.cityText ?? suggestion.cityText,
+      latitude: approveSuggestionDto.latitude,
+      longitude: approveSuggestionDto.longitude,
       wasteTypeText: approveSuggestionDto.wasteTypeText ?? suggestion.wasteTypeText,
       openingHoursText:
         approveSuggestionDto.openingHoursText ?? suggestion.openingHoursText,

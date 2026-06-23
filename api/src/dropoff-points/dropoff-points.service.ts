@@ -38,6 +38,8 @@ export class DropoffPointsService {
         street: addresses.street,
         number: addresses.number,
         district: addresses.district,
+        latitude: addresses.latitude,
+        longitude: addresses.longitude,
       })
       .from(dropoffPoints)
       .innerJoin(addresses, eq(dropoffPoints.addressId, addresses.id))
@@ -57,6 +59,8 @@ export class DropoffPointsService {
       addressLine: `${row.street}, ${row.number} - ${row.district}`,
       acceptedWasteSummary: acceptedWasteMap.get(row.id) ?? 'Sem residuos associados.',
       validationStatus: row.validationStatus as 'validated' | 'needs_confirmation',
+      latitude: this.parseCoordinate(row.latitude),
+      longitude: this.parseCoordinate(row.longitude),
     }));
   }
 
@@ -75,6 +79,8 @@ export class DropoffPointsService {
         number: addresses.number,
         district: addresses.district,
         city: addresses.city,
+        latitude: addresses.latitude,
+        longitude: addresses.longitude,
       })
       .from(dropoffPoints)
       .innerJoin(addresses, eq(dropoffPoints.addressId, addresses.id))
@@ -109,6 +115,8 @@ export class DropoffPointsService {
       addressLine: `${point.street}, ${point.number} - ${point.district}`,
       district: point.district,
       city: point.city,
+      latitude: this.parseCoordinate(point.latitude),
+      longitude: this.parseCoordinate(point.longitude),
       acceptedWaste,
     };
   }
@@ -135,6 +143,8 @@ export class DropoffPointsService {
         street: addresses.street,
         number: addresses.number,
         district: addresses.district,
+        latitude: addresses.latitude,
+        longitude: addresses.longitude,
       })
       .from(dropoffPoints)
       .innerJoin(addresses, eq(dropoffPoints.addressId, addresses.id))
@@ -146,6 +156,8 @@ export class DropoffPointsService {
       status: row.status,
       validationStatus: row.validationStatus as 'validated' | 'needs_confirmation',
       addressLine: `${row.street}, ${row.number} - ${row.district}`,
+      latitude: this.parseCoordinate(row.latitude),
+      longitude: this.parseCoordinate(row.longitude),
     }));
   }
 
@@ -159,6 +171,8 @@ export class DropoffPointsService {
         district: createDropoffPointDto.district,
         city: createDropoffPointDto.city,
         state: createDropoffPointDto.state ?? 'MS',
+        latitude: this.toCoordinateString(createDropoffPointDto.latitude),
+        longitude: this.toCoordinateString(createDropoffPointDto.longitude),
       })
       .returning();
 
@@ -187,6 +201,11 @@ export class DropoffPointsService {
 
   async update(id: number, updateDropoffPointDto: UpdateDropoffPointDto) {
     const current = await this.ensureExists(id);
+    const hasAddressUpdate =
+      updateDropoffPointDto.addressText != null ||
+      updateDropoffPointDto.district != null ||
+      updateDropoffPointDto.city != null ||
+      updateDropoffPointDto.state != null;
 
     await this.databaseService.db
       .update(dropoffPoints)
@@ -199,7 +218,7 @@ export class DropoffPointsService {
       })
       .where(eq(dropoffPoints.id, id));
 
-    if (updateDropoffPointDto.addressText || updateDropoffPointDto.district || updateDropoffPointDto.city) {
+    if (hasAddressUpdate) {
       const { street, number } = this.splitAddressText(updateDropoffPointDto.addressText ?? '');
       await this.databaseService.db
         .update(addresses)
@@ -209,6 +228,32 @@ export class DropoffPointsService {
           district: updateDropoffPointDto.district,
           city: updateDropoffPointDto.city,
           state: updateDropoffPointDto.state,
+          latitude:
+            updateDropoffPointDto.latitude != null
+              ? this.toCoordinateString(updateDropoffPointDto.latitude)
+              : hasAddressUpdate
+                ? null
+                : undefined,
+          longitude:
+            updateDropoffPointDto.longitude != null
+              ? this.toCoordinateString(updateDropoffPointDto.longitude)
+              : hasAddressUpdate
+                ? null
+                : undefined,
+        })
+        .where(eq(addresses.id, current.addressId));
+    } else if (updateDropoffPointDto.latitude != null || updateDropoffPointDto.longitude != null) {
+      await this.databaseService.db
+        .update(addresses)
+        .set({
+          latitude:
+            updateDropoffPointDto.latitude != null
+              ? this.toCoordinateString(updateDropoffPointDto.latitude)
+              : undefined,
+          longitude:
+            updateDropoffPointDto.longitude != null
+              ? this.toCoordinateString(updateDropoffPointDto.longitude)
+              : undefined,
         })
         .where(eq(addresses.id, current.addressId));
     }
@@ -263,6 +308,8 @@ export class DropoffPointsService {
     wasteTypeIds?: number[];
     validationStatus?: 'validated' | 'needs_confirmation';
     status?: 'active' | 'inactive';
+    latitude?: number;
+    longitude?: number;
   }) {
     const wasteTypeIds =
       input.wasteTypeIds && input.wasteTypeIds.length > 0
@@ -276,6 +323,8 @@ export class DropoffPointsService {
       addressText: input.addressText,
       district: input.districtText,
       city: input.cityText,
+      latitude: input.latitude,
+      longitude: input.longitude,
       wasteTypeIds,
       state: 'MS',
     }).then(async (createdPoint) => {
@@ -299,6 +348,8 @@ export class DropoffPointsService {
       addressText?: string;
       districtText?: string;
       cityText?: string;
+      latitude?: number;
+      longitude?: number;
       wasteTypeText?: string;
       openingHoursText?: string | null;
       note?: string | null;
@@ -306,6 +357,10 @@ export class DropoffPointsService {
     },
   ) {
     const current = await this.ensureExists(pointId);
+    const hasAddressUpdate =
+      changes.addressText != null ||
+      changes.districtText != null ||
+      changes.cityText != null;
 
     await this.databaseService.db
       .update(dropoffPoints)
@@ -317,7 +372,7 @@ export class DropoffPointsService {
       })
       .where(eq(dropoffPoints.id, pointId));
 
-    if (changes.addressText || changes.districtText || changes.cityText) {
+    if (hasAddressUpdate) {
       const parsed = this.splitAddressText(changes.addressText ?? '');
       await this.databaseService.db
         .update(addresses)
@@ -326,6 +381,26 @@ export class DropoffPointsService {
           number: changes.addressText ? parsed.number : undefined,
           district: changes.districtText,
           city: changes.cityText,
+          latitude:
+            changes.latitude != null
+              ? this.toCoordinateString(changes.latitude)
+              : hasAddressUpdate
+                ? null
+                : undefined,
+          longitude:
+            changes.longitude != null
+              ? this.toCoordinateString(changes.longitude)
+              : hasAddressUpdate
+                ? null
+                : undefined,
+        })
+        .where(eq(addresses.id, current.addressId));
+    } else if (changes.latitude != null || changes.longitude != null) {
+      await this.databaseService.db
+        .update(addresses)
+        .set({
+          latitude: changes.latitude != null ? this.toCoordinateString(changes.latitude) : undefined,
+          longitude: changes.longitude != null ? this.toCoordinateString(changes.longitude) : undefined,
         })
         .where(eq(addresses.id, current.addressId));
     }
@@ -403,5 +478,18 @@ export class DropoffPointsService {
       street: street || 'Endereco nao informado',
       number: number || 'S/N',
     };
+  }
+
+  private toCoordinateString(value?: number) {
+    return value != null ? String(value) : null;
+  }
+
+  private parseCoordinate(value: string | null) {
+    if (!value) {
+      return null;
+    }
+
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   }
 }

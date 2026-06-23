@@ -16,6 +16,8 @@ export interface DropoffPointSummary {
   addressLine: string
   acceptedWasteSummary: string
   validationStatus: ValidationStatus
+  latitude: number | null
+  longitude: number | null
 }
 
 export interface DropoffPointDetail {
@@ -30,6 +32,8 @@ export interface DropoffPointDetail {
   addressLine: string
   district: string
   city: string
+  latitude: number | null
+  longitude: number | null
   acceptedWaste: Array<{
     id: number
     name: string
@@ -89,4 +93,6 @@ export interface AdminDropoffPoint {
   status: string
   validationStatus: ValidationStatus
   addressLine: string
+  latitude: number | null
+  longitude: number | null
 }

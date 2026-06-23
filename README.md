@@ -108,6 +108,6 @@ VITE_API_URL=http://localhost:3000/api
 
 ## Observacoes
 
-- a area de mapa do MVP e visual, sem integracao com servico real de mapas
+- o mapa usa tiles gratuitos do OpenStreetMap e depende de coordenadas cadastradas nos pontos
 - sugestoes de novo ponto e correcoes compartilham a mesma fila administrativa
 - se o ambiente local bloquear Node em WSL 1, execute os scripts em WSL 2 ou no Windows nativo

@@ -14,7 +14,7 @@ Frontend da aplicacao EcoDescarte, construida com React, Vite, TypeScript e Tail
 ## Telas principais
 
 - `/` tela inicial com busca e atalhos por residuo
-- `/pontos` listagem com filtros e mapa visual
+- `/pontos` listagem com filtros e mapa real
 - `/pontos/:id` detalhes do ponto
 - `/sugerir-ponto` envio de sugestao publica
 - `/admin/login` autenticacao administrativa
@@ -59,7 +59,8 @@ O frontend espera que a API esteja disponivel em `VITE_API_URL`.
 ## Comportamento importante
 
 - o token administrativo e salvo em `localStorage`
-- o mapa da aplicacao e visual, sem provider externo
+- o mapa usa Leaflet com tiles gratuitos do OpenStreetMap
+- pontos sem coordenadas continuam listados, mas nao aparecem como marcadores
 - as telas seguem a estrutura funcional do projeto em implementacao React/Tailwind
 
 ## Arquivos relevantes

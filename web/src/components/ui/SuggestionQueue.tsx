@@ -2,12 +2,16 @@ import { useState } from 'react'
 import type { SuggestionItem } from '../../types/models.ts'
 
 interface SuggestionQueueProps {
+  coordinateDrafts: Record<number, { latitude: string; longitude: string }>
   suggestions: SuggestionItem[]
+  onCoordinateChange: (suggestionId: number, field: 'latitude' | 'longitude', value: string) => void
   onApprove: (suggestion: SuggestionItem) => Promise<void>
   onReject: (suggestion: SuggestionItem) => Promise<void>
 }
 
 export function SuggestionQueue({
+  coordinateDrafts,
+  onCoordinateChange,
   onApprove,
   onReject,
   suggestions,
@@ -58,6 +62,30 @@ export function SuggestionQueue({
                 Aceita: {suggestion.wasteTypeText}.{' '}
                 {suggestion.note ? suggestion.note : 'Sem observacoes adicionais.'}
               </p>
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                <input
+                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
+                  inputMode="decimal"
+                  placeholder="Latitude"
+                  step="any"
+                  type="number"
+                  value={coordinateDrafts[suggestion.id]?.latitude ?? ''}
+                  onChange={(event) =>
+                    onCoordinateChange(suggestion.id, 'latitude', event.target.value)
+                  }
+                />
+                <input
+                  className="rounded-xl border border-slate-200 px-4 py-3 text-sm"
+                  inputMode="decimal"
+                  placeholder="Longitude"
+                  step="any"
+                  type="number"
+                  value={coordinateDrafts[suggestion.id]?.longitude ?? ''}
+                  onChange={(event) =>
+                    onCoordinateChange(suggestion.id, 'longitude', event.target.value)
+                  }
+                />
+              </div>
             </div>
             <div className="flex flex-wrap justify-end gap-2">
               <button

@@ -25,7 +25,10 @@ export function AdminDashboardPage() {
   const [newPointAddress, setNewPointAddress] = useState('')
   const [newPointDistrict, setNewPointDistrict] = useState('')
   const [newPointCity, setNewPointCity] = useState('Campo Grande')
+  const [newPointLatitude, setNewPointLatitude] = useState('')
+  const [newPointLongitude, setNewPointLongitude] = useState('')
   const [selectedWasteTypeIds, setSelectedWasteTypeIds] = useState<number[]>([])
+  const [coordinateDrafts, setCoordinateDrafts] = useState<Record<number, { latitude: string; longitude: string }>>({})
   const [error, setError] = useState<string | null>(null)
 
   async function loadDashboard() {
@@ -75,7 +78,18 @@ export function AdminDashboardPage() {
         {summary ? <AdminSummaryCards summary={summary} /> : null}
 
         <SuggestionQueue
+          coordinateDrafts={coordinateDrafts}
           suggestions={suggestions}
+          onCoordinateChange={(suggestionId, field, value) => {
+            setCoordinateDrafts((current) => ({
+              ...current,
+              [suggestionId]: {
+                latitude: current[suggestionId]?.latitude ?? '',
+                longitude: current[suggestionId]?.longitude ?? '',
+                [field]: value,
+              },
+            }))
+          }}
           onApprove={async (suggestion) => {
             if (!token) {
               return
@@ -85,10 +99,14 @@ export function AdminDashboardPage() {
               suggestion.wasteTypeText.toLowerCase().includes(wasteType.name.toLowerCase()),
             )
 
+            const coordinateDraft = coordinateDrafts[suggestion.id]
+
             await ecodescarteApi.approveSuggestion(token, suggestion.id, {
               wasteTypeIds: matchedWasteType ? [matchedWasteType.id] : undefined,
               validationStatus: 'validated',
               status: 'active',
+              latitude: parseOptionalCoordinate(coordinateDraft?.latitude),
+              longitude: parseOptionalCoordinate(coordinateDraft?.longitude),
             })
             await loadDashboard()
           }}
@@ -120,12 +138,16 @@ export function AdminDashboardPage() {
                     district: newPointDistrict,
                     city: newPointCity,
                     wasteTypeIds: selectedWasteTypeIds,
+                    latitude: parseOptionalCoordinate(newPointLatitude),
+                    longitude: parseOptionalCoordinate(newPointLongitude),
                   })
                   .then(() => {
                     setNewPointName('')
                     setNewPointAddress('')
                     setNewPointDistrict('')
                     setNewPointCity('Campo Grande')
+                    setNewPointLatitude('')
+                    setNewPointLongitude('')
                     setSelectedWasteTypeIds([])
                     return loadDashboard()
                   })
@@ -159,6 +181,26 @@ export function AdminDashboardPage() {
                   required
                   value={newPointCity}
                   onChange={(event) => setNewPointCity(event.target.value)}
+                />
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <input
+                  className="rounded-xl border border-slate-200 px-4 py-3"
+                  inputMode="decimal"
+                  placeholder="Latitude"
+                  step="any"
+                  type="number"
+                  value={newPointLatitude}
+                  onChange={(event) => setNewPointLatitude(event.target.value)}
+                />
+                <input
+                  className="rounded-xl border border-slate-200 px-4 py-3"
+                  inputMode="decimal"
+                  placeholder="Longitude"
+                  step="any"
+                  type="number"
+                  value={newPointLongitude}
+                  onChange={(event) => setNewPointLongitude(event.target.value)}
                 />
               </div>
               <div className="flex flex-wrap gap-2">
@@ -200,6 +242,11 @@ export function AdminDashboardPage() {
                   <div>
                     <p className="font-semibold text-slate-900">{point.name}</p>
                     <p className="text-sm text-slate-500">{point.addressLine}</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      {point.latitude != null && point.longitude != null
+                        ? `Mapa ativo: ${point.latitude}, ${point.longitude}`
+                        : 'Sem coordenadas cadastradas'}
+                    </p>
                   </div>
                   <button
                     className="rounded-lg border border-slate-300 px-3 py-2 text-sm"
@@ -261,4 +308,13 @@ export function AdminDashboardPage() {
       </div>
     </AppShell>
   )
+}
+
+function parseOptionalCoordinate(value?: string) {
+  if (!value) {
+    return undefined
+  }
+
+  const parsed = Number(value.replace(',', '.'))
+  return Number.isFinite(parsed) ? parsed : undefined
 }
